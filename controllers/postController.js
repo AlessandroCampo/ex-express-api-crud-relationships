@@ -165,7 +165,48 @@ const comment = async (req, res, next) => {
     const { slug } = req.params;
 }
 
+const changeVisibility = async (req, res, next) => {
+    const { slug } = req.params;
+    const { published } = req.body;
+    console.log(Boolean(published))
+    try {
+        const modifiedPost = await prisma.post.update({
+            where: { slug },
+            data: {
+                published: Boolean(Number(published))
+            }
+        })
+        res.json({
+            message: `Post with slug ${slug} has successfully been ${published ? 'published' : 'hidden'}`,
+            modifiedPost,
+        })
+    } catch (error) {
+        const customError = prismaErorrHandler(error);
+        next(customError);
+    }
+}
+
+const editContent = async (req, res, next) => {
+    const { slug } = req.params;
+    const { content } = req.body;
+    try {
+        const editedPost = await prisma.post.update({
+            where: { slug },
+            data: {
+                content: content
+            }
+        })
+        res.json({
+            message: `Post with slug ${slug}'s content has successfully edited to ${content}`,
+            editedPost,
+        })
+    } catch (error) {
+        const customError = prismaErorrHandler(error);
+        next(customError);
+    }
+}
+
 
 module.exports = {
-    index, show, create, update, destroy
+    index, show, create, update, destroy, comment, changeVisibility, editContent
 }

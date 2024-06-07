@@ -40,7 +40,7 @@ const post = {
             bail: true
         },
         isLength: {
-            options: { min: 5, max: 50 },
+            options: { min: 5, max: 250 },
             errorMessage: "The title of your post should be between 5 and 50 characters long.",
             bail: true
         }
@@ -94,7 +94,26 @@ const postSlug = {
     }
 }
 
+const postContent = {
+    content: {
+        in: ["body"],
+        notEmpty: {
+            errorMessage: "Please add a caption for your post",
+            bail: true
+        },
+        isString: {
+            errorMessage: "The caption of your post should only contain letters.",
+            bail: true
+        },
+        isLength: {
+            options: { min: 5, max: 250 },
+            errorMessage: "The title of your post should be between 5 and 50 characters long.",
+            bail: true
+        }
+    },
+}
 
 
 
-module.exports = { post, postSlug }
+
+module.exports = { post, postSlug, postContent }

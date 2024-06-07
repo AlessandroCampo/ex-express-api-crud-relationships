@@ -12,6 +12,8 @@ router.get('/', postController.index)
 router.get('/:slug', validator(schemas.postSlug), postController.show)
 router.put('/:slug', validator(schemas.postSlug), validator(schemas.post), postController.update)
 router.delete('/:slug', validator(schemas.postSlug), postController.destroy)
+router.patch('/:slug/change-visibility', validator(schemas.postSlug), postController.changeVisibility);
+router.patch('/:slug/content', validator(schemas.postSlug), validator(schemas.postContent), postController.editContent);
 
 
 
