@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const CustomError = require("../utils/CustomError");
+const { isValidURL } = require("../utils/genericUtils");
 const prisma = new PrismaClient();
 
 
@@ -20,6 +21,19 @@ const post = {
             options: { min: 5, max: 50 },
             errorMessage: "The title of your post should be between 5 and 50 characters long.",
             bail: true
+        }
+    },
+    image: {
+        in: ["body"],
+        optional: true,
+        custom: {
+            options: (url) => {
+                const urlIsValid = isValidURL(url);
+                if (!urlIsValid) {
+                    throw new CustomError('Validation error', "The image field contains a non valid URL.", 400)
+                }
+                return true
+            }
         }
     },
     content: {
