@@ -9,6 +9,7 @@ const postRouter = require('./routers/postRouter');
 const globalErrorHandler = require('./middlewares/globalErrorHandler');
 //middlewares
 app.use(express.json());
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
 

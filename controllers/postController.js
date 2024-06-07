@@ -6,7 +6,7 @@ const createUniqueSlugForPost = require('../utils/createUniqueSlugForPost.js');
 
 
 const create = async (req, res, next) => {
-    const { name, content, published, userId, } = req.body;
+    const { name, content, published, userId, image } = req.body;
     if (!name) {
         return next(new CustomError('Validation error', 'The name field is required', 400))
     }
@@ -14,6 +14,7 @@ const create = async (req, res, next) => {
         name,
         content,
         published,
+        image,
         slug: await createUniqueSlugForPost(name),
         userId: Number(userId)
     }

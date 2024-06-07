@@ -7,9 +7,10 @@ const prisma = new PrismaClient();
 const post = {
     name: {
         in: ["body"],
+        escape: true,
         notEmpty: {
             errorMessage: "Please add a title for your post",
-            bail: true
+            bail: true,
         },
         isString: {
             errorMessage: "The title of your post should only contain letters.",
@@ -21,16 +22,9 @@ const post = {
             bail: true
         }
     },
-    image: {
-        in: ["body"],
-        optional: true,
-        isURL: {
-            errorMessage: "The image field must be a valid URL.",
-            bail: true
-        }
-    },
     content: {
         in: ["body"],
+        escape: true,
         notEmpty: {
             errorMessage: "Please add a caption for your post",
             bail: true
