@@ -8,7 +8,7 @@ const user = {
     username: {
         in: ["body"],
         escape: true,
-        isEmpty: {
+        notEmpty: {
             errorMessage: "Please select an username for your account",
             bail: true,
         },
@@ -20,6 +20,18 @@ const user = {
             options: { min: 5, max: 50 },
             errorMessage: "Your username should be between 5 and 50 characters long.",
             bail: true
+        },
+        custom: {
+            options: async (username) => {
+                console.log(username)
+                const foundUser = await prisma.user.findUnique({
+                    where: { username }
+                })
+                if (foundUser) {
+                    throw new CustomError('An user with this username already exists', `An user with username ${username} already exists. Please choose another username for your account`, 400)
+                }
+                return true
+            }
         }
     },
     email: {
@@ -31,19 +43,37 @@ const user = {
         isEmail: {
             errorMessage: "Invalid email address",
             bail: true
+        },
+        custom: {
+            options: async (email) => {
+                const foundUser = await prisma.user.findUnique({
+                    where: { email }
+                })
+                if (foundUser) {
+                    throw new CustomError('An user with this email already exists', `An user with email ${email} already exists. If you own that account, please log in with your data`, 400)
+                }
+                return true
+            }
         }
     },
-    isStrongPassword: {
-        options: {
-            minLength: 8,
-            minLowercase: 1,
-            minUppercase: 1,
-            minNumbers: 1,
-            minSymbols: 0,
-            returnScore: false,
+    password: {
+        in: ["body"],
+        notEmpty: {
+            errorMessage: "Please insert a password for your account",
+            bail: true,
         },
-        errorMessage: "Password should be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number",
-        bail: true
+        isStrongPassword: {
+            options: {
+                minLength: 8,
+                minLowercase: 1,
+                minUppercase: 1,
+                minNumbers: 1,
+                minSymbols: 0,
+                returnScore: false,
+            },
+            errorMessage: "Password should be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number",
+            bail: true
+        }
     },
     image: {
         in: ["body"],
@@ -58,4 +88,9 @@ const user = {
             }
         }
     },
+}
+
+
+module.exports = {
+    user
 }
