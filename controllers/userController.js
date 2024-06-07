@@ -21,7 +21,10 @@ const register = async (req, res, next) => {
         const token = generateToken(newUser);
         return res.json({
             message: 'Your account has been succesfully created',
-            newUser,
+            yourAccount: {
+                username: newUser.username,
+                email: newUser.email
+            },
             token
         })
     } catch (err) {
