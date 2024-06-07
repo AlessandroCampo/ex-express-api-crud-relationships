@@ -9,9 +9,9 @@ const schemas = require('../validations/postValidations.js');
 
 router.post('/', validator(schemas.post), postController.create)
 router.get('/', postController.index)
-router.get('/:slug', postController.show)
-router.put('/:slug', postController.update)
-router.delete('/:slug', postController.destroy)
+router.get('/:slug', validator(schemas.postSlug), postController.show)
+router.put('/:slug', validator(schemas.postSlug), validator(schemas.post), postController.update)
+router.delete('/:slug', validator(schemas.postSlug), postController.destroy)
 
 
 

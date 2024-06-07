@@ -123,7 +123,7 @@ const update = async (req, res, next) => {
         const updateData = {};
         if (name !== undefined) {
             updateData.name = name
-            updateData.slug = slugify(name)
+            updateData.slug = await createUniqueSlugForPost(name)
         };
         if (content !== undefined) updateData.content = content;
         if (published !== undefined) updateData.published = published;

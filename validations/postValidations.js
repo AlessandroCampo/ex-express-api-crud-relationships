@@ -69,7 +69,32 @@ const post = {
     }
 };
 
+const postSlug = {
+    slug: {
+        in: ["params"],
+        notEmpty: {
+            errorMessage: "Could not find a post with the required slug",
+            bail: true
+        },
+        isString: {
+            errorMessage: "The slug post may only contain letters",
+            bail: true
+        },
+        custom: {
+            options: async (pSlug) => {
+                const foundPost = await prisma.post.findUnique({
+                    where: { slug: pSlug }
+                })
+                if (!foundPost) {
+                    throw new CustomError('Not found', `Could not find any post with slug ${pSlug}`, 404)
+                }
+                return true
+            }
+        }
+    }
+}
 
 
 
-module.exports = { post }
+
+module.exports = { post, postSlug }
