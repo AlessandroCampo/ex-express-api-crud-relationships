@@ -29,16 +29,17 @@ model Post {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  username   String    @unique
-  email      String    @unique
-  avatar     String
-  password   String
-  posts      Post[]
-  comments   Comment[]
-  likes      Like[]
-  followedBy User[]    @relation("UserFollows")
-  following  User[]    @relation("UserFollows")
+  id                  Int       @id @default(autoincrement())
+  username            String    @unique
+  email               String    @unique
+  avatar              String?
+  password            String
+  posts               Post[]
+  comments            Comment[]
+  likes               Like[]
+  followedBy          User[]    @relation("UserFollows")
+  following           User[]    @relation("UserFollows")
+  failedLoginAttempts Int       @default(0)
 }
 
 model Comment {

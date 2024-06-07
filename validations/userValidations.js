@@ -2,6 +2,8 @@ const { PrismaClient } = require("@prisma/client");
 const CustomError = require("../utils/CustomError");
 const { isValidURL } = require("../utils/genericUtils");
 const prisma = new PrismaClient();
+const { comparePassword } = require('../utils/passwordUtils.js')
+
 
 
 const user = {
@@ -23,7 +25,6 @@ const user = {
         },
         custom: {
             options: async (username) => {
-                console.log(username)
                 const foundUser = await prisma.user.findUnique({
                     where: { username }
                 })
@@ -91,6 +92,87 @@ const user = {
 }
 
 
+const login = {
+    username: {
+        in: ["body"],
+        escape: true,
+        notEmpty: {
+            errorMessage: "Please enter a username before trying to login",
+            bail: true,
+        },
+        isAlphanumeric: {
+            errorMessage: "Your username is a combination of letters, numbers and symbols",
+            bail: true
+        },
+        isLength: {
+            options: { min: 5, max: 50 },
+            errorMessage: "Your username is between 5 and 50 characters long.",
+            bail: true
+        },
+        custom: {
+            options: async (username, { req }) => {
+                const foundUser = await prisma.user.findUnique({
+                    where: { username }
+                });
+                if (!foundUser) {
+                    throw new CustomError('Incorrect username', `Could not find a user with ${username}. If you forgot your username, you can request it via email`, 400);
+                }
+                req.body.user = foundUser;
+                return true;
+            }
+        }
+    },
+    password: {
+        in: ["body"],
+        notEmpty: {
+            errorMessage: "Insert your password before trying to login",
+            bail: true,
+        },
+        isLength: {
+            options: {
+                min: 8
+            },
+            errorMessage: "Your password is at least 8 characters long",
+            bail: true
+        },
+        custom: {
+            options: async (password, { req }) => {
+                const user = req.body.user;
+                if (!user) {
+                    throw new CustomError('Invalid request', 'No user found for the provided username', 400);
+                }
+
+                if (user.failedLoginAttempts >= 5) {
+                    throw new CustomError('Account suspended', 'Your account has beeen suspended for security reasons, please contact the admins at boolbook@support.com', 400);
+                }
+
+                const isPasswordValid = await comparePassword(password, user.password);
+                if (!isPasswordValid) {
+                    await prisma.user.update({
+                        where: { username: user.username },
+                        data: {
+                            failedLoginAttempts: {
+                                increment: 1
+                            }
+                        }
+                    });
+                    throw new CustomError('Incorrect password', `Your password is incorrect, please try again. You may only attempt to login ${5 - user.failedLoginAttempts}  times incorrectly, after that your account will be suspended`, 400);
+                }
+
+                await prisma.user.update({
+                    where: { username: user.username },
+                    data: {
+                        failedLoginAttempts: 0
+                    }
+                });
+
+                return true;
+            }
+        }
+    },
+};
+
+
 module.exports = {
-    user
+    user, login
 }

@@ -17,7 +17,7 @@ const uploadFile = (req, res, next) => {
             fs.unlinkSync(req.file.path);
             return next(err);
         } else if (!req.file) {
-            return next(new Error('No file uploaded'));
+            return next();
         }
 
         if (req.file.size > (10 * 1024 * 1024)) {
