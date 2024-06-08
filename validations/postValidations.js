@@ -145,7 +145,7 @@ const comment = {
 
 }
 
-const addLike = {
+const like = {
     userId: {
         in: ["body"],
         custom: {
@@ -157,17 +157,23 @@ const addLike = {
                     }
                 });
 
-                if (existingLike) {
-                    throw new CustomError('Post already liked', `You already liked the post with name ${req.body.post.name}`, 400)
+                if (req.method === 'POST') {
+                    if (existingLike) {
+                        throw new CustomError('Post already liked', `You already liked the post with name ${req.body.post.name}`, 400);
+                    }
+                } else if (req.method === 'DELETE') {
+                    if (!existingLike) {
+                        throw new CustomError('Post not liked', `You have not liked the post with name ${req.body.post.name}`, 400);
+                    }
+                    req.body.likeId = existingLike.id;
                 }
-                return true
+                return true;
             }
         }
     }
-
-}
-
+};
 
 
 
-module.exports = { post, postSlug, postContent, comment, addLike }
+
+module.exports = { post, postSlug, postContent, comment, like }

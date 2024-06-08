@@ -25,7 +25,8 @@ router.delete('/:slug', auth, isUserPost, validator(schemas.postSlug), postContr
 router.patch('/:slug/change-visibility', auth, isUserPost, validator(schemas.postSlug), postController.changeVisibility);
 router.patch('/:slug/content', auth, isUserPost, validator(schemas.postSlug), validator(schemas.postContent), postController.editContent);
 router.post('/:slug/comment', auth, validator(schemas.postSlug), validator(schemas.comment), postController.comment)
-router.post('/:slug/like', auth, validator(schemas.postSlug), validator(schemas.addLike), postController.like)
+router.post('/:slug/like', auth, validator(schemas.postSlug), validator(schemas.like), postController.like)
+router.delete('/:slug/like', auth, validator(schemas.postSlug), validator(schemas.like), postController.removeLike)
 
 
 

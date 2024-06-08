@@ -210,8 +210,33 @@ const like = async (req, res, next) => {
         next(customError);
     }
 
+
+
 }
 
+const removeLike = async (req, res, next) => {
+    const { slug } = req.params;
+    const { likeId } = req.body;
+    try {
+        if (!likeId) {
+            throw new CustomError('Like not found', `You have not liked the post with slug ${slug}`, 404);
+        }
+        const remvoedLike = await prisma.like.delete({
+            where: {
+                id: likeId
+            }
+        });
+        res.json({
+            message: `Your like has been removed from the post  with slug ${slug}`,
+            remvoedLike,
+        })
+    } catch (err) {
+        const customError = prismaErorrHandler(err);
+        next(customError);
+    }
+
+
+}
 const changeVisibility = async (req, res, next) => {
     const { slug } = req.params;
     const { published } = req.body;
@@ -255,5 +280,5 @@ const editContent = async (req, res, next) => {
 
 
 module.exports = {
-    index, show, create, update, destroy, comment, changeVisibility, editContent, like
+    index, show, create, update, destroy, comment, changeVisibility, editContent, like, removeLike
 }
