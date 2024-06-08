@@ -21,5 +21,5 @@ module.exports = async (name) => {
         }
     } while (slugExists);
 
-    return newSlug;
+    return newSlug.toLocalLowerCase();
 };

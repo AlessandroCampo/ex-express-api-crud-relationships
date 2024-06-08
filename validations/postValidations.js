@@ -89,13 +89,15 @@ const postSlug = {
             bail: true
         },
         custom: {
-            options: async (pSlug) => {
+            options: async (pSlug, { req }) => {
                 const foundPost = await prisma.post.findUnique({
                     where: { slug: pSlug }
                 })
                 if (!foundPost) {
                     throw new CustomError('Not found', `Could not find any post with slug ${pSlug}`, 404)
                 }
+                req.body.post = foundPost;
+                req.body.postId = foundPost.id;
                 return true
             }
         }
@@ -122,6 +124,50 @@ const postContent = {
 }
 
 
+const comment = {
+    content: {
+        in: ["body"],
+        escape: true,
+        notEmpty: {
+            errorMessage: "Your comment is empty",
+            bail: true
+        },
+        isString: {
+            errorMessage: "Your comment may only contain text.",
+            bail: true
+        },
+        isLength: {
+            options: { min: 5, max: 250 },
+            errorMessage: "The length of your comment should be between 5 and 50 characters long.",
+            bail: true
+        }
+    }
+
+}
+
+const addLike = {
+    userId: {
+        in: ["body"],
+        custom: {
+            options: async (uid, { req }) => {
+                const existingLike = await prisma.like.findFirst({
+                    where: {
+                        userId: uid,
+                        postId: req.body.postId
+                    }
+                });
+
+                if (existingLike) {
+                    throw new CustomError('Post already liked', `You already liked the post with name ${req.body.post.name}`, 400)
+                }
+                return true
+            }
+        }
+    }
+
+}
 
 
-module.exports = { post, postSlug, postContent }
+
+
+module.exports = { post, postSlug, postContent, comment, addLike }

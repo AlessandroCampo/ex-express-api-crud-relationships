@@ -164,6 +164,52 @@ const destroy = async (req, res, next) => {
 
 const comment = async (req, res, next) => {
     const { slug } = req.params;
+    const { content, userId, postId } = req.body;
+    try {
+        if (!postId) {
+            throw new CustomError("Post not found", `Post with slug ${slug} was not found`, 404)
+        }
+        const data = {
+            content, userId, postId
+
+        }
+        const newComment = await prisma.comment.create({
+            data
+        });
+        res.json({
+            message: `A new comment has been added to the post  with slug ${slug}`,
+            newComment,
+        })
+    } catch (err) {
+        const customError = prismaErorrHandler(err);
+        next(customError);
+    }
+
+}
+
+const like = async (req, res, next) => {
+    const { slug } = req.params;
+    const { userId, postId } = req.body;
+    try {
+        if (!postId) {
+            throw new CustomError("Post not found", `Post with slug ${slug} was not found`, 404)
+        }
+        const data = {
+            userId, postId
+
+        }
+        const newLike = await prisma.like.create({
+            data
+        });
+        res.json({
+            message: `A new like has been added to the post  with slug ${slug}`,
+            newLike,
+        })
+    } catch (err) {
+        const customError = prismaErorrHandler(err);
+        next(customError);
+    }
+
 }
 
 const changeVisibility = async (req, res, next) => {
@@ -209,5 +255,5 @@ const editContent = async (req, res, next) => {
 
 
 module.exports = {
-    index, show, create, update, destroy, comment, changeVisibility, editContent
+    index, show, create, update, destroy, comment, changeVisibility, editContent, like
 }
