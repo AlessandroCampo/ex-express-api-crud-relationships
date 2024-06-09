@@ -51,8 +51,75 @@ const login = async (req, res, next) => {
     })
 }
 
+const follow = async (req, res, next) => {
+    const { userId } = req.body;
+    const userToFollowId = req.params.userId;
+
+    try {
+        if (Number(userId) === Number(userToFollowId)) {
+            throw new CustomError("Self Follow", "I appreciate the self-esteem, but you cannot follow your own account", 400)
+        }
+        const followedUser = await prisma.user.update({
+            where: { id: Number(userToFollowId) },
+            data: {
+                followedBy: {
+                    connect: { id: Number(userId) }
+                }
+            },
+            select: {
+                username: true,
+                email: true,
+                followedBy: {
+                    select: {
+                        username: true
+                    }
+                }
+            }
+        })
+        return res.json({
+            message: `You succesfully started following ${followedUser.username}`,
+            followedUser
+        })
+    } catch (err) {
+        const customError = prismaErorrHandler(err);
+        next(customError);
+    }
+}
+
+const unfollow = async (req, res, next) => {
+    const { userId } = req.body;
+    const userToUnfollowId = req.params.userId;
+
+    try {
+        const unfollowedUser = await prisma.user.update({
+            where: { id: Number(userToUnfollowId) },
+            data: {
+                followedBy: {
+                    disconnect: { id: Number(userId) }
+                }
+            },
+            select: {
+                username: true,
+                email: true,
+                followedBy: {
+                    select: {
+                        username: true
+                    }
+                }
+            }
+        })
+        return res.json({
+            message: `You succesfully unfollowed ${unfollowedUser.username}`,
+            unfollowedUser
+        })
+    } catch (err) {
+        const customError = prismaErorrHandler(err);
+        next(customError);
+    }
+}
+
 
 
 module.exports = {
-    register, login
+    register, login, follow, unfollow
 }
