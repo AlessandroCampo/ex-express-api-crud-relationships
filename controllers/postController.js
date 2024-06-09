@@ -31,17 +31,22 @@ const create = async (req, res, next) => {
 };
 
 const index = async (req, res, next) => {
+    //this function has been recycled in both posts and user controller, in order to be able to return  either all posts or just the selected user posts
     const where = {};
     const { page = 1, limit = 10, published, containedString } = req.query;
+    const { userId } = req.params;
     if (published) where.published = published === 'true';
     if (containedString) where.name = { contains: containedString };
+    if (userId) where.userId = Number(userId)
+
 
 
     const offset = (page - 1) * limit;
-    const totalPosts = await prisma.post.count();
+    const totalPosts = await prisma.post.count({ where });
     const totalPages = Math.ceil(totalPosts / limit);
 
     try {
+
         const allPosts = await prisma.post.findMany({
             take: Number(limit),
             skip: offset,
@@ -75,6 +80,16 @@ const index = async (req, res, next) => {
         next(customError);
     }
 };
+
+const userIndex = async (req, res, next) => {
+    const where = {};
+    const { page = 1, limit = 10, published, containedString } = req.query;
+    const { userId } = req.params;
+    if (!userId) {
+        throw new CustomError("Authorization Error", "Could not retrieve your account's data, make sure you are logged in before trying to access your posts", 404)
+    }
+
+}
 
 
 const show = async (req, res, next) => {

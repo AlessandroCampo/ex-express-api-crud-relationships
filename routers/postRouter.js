@@ -12,9 +12,6 @@ const schemas = require('../validations/postValidations.js');
 const uploadFile = require('../middlewares/checkImage.js');
 const auth = require('../middlewares/auth.js');
 const isUserPost = require('../middlewares/isUserPost.js');
-const commentSchema = require('../validations/commentValidations.js');
-
-
 
 
 router.post('/', auth, uploadFile, validator(schemas.post), postController.create)

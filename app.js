@@ -7,6 +7,7 @@ const globalErrorHandler = require('./middlewares/globalErrorHandler.js');
 //routers import
 const postRouter = require('./routers/postRouter.js');
 const userRouter = require('./routers/userRouter.js');
+const commentRotuer = require('./routers/commentRouter.js');
 
 //middlewares
 
@@ -15,6 +16,7 @@ app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 app.use('/posts', postRouter);
 app.use('/users', userRouter);
+app.use('/comments', commentRotuer);
 
 
 
