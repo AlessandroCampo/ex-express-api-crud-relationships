@@ -115,7 +115,8 @@ const login = {
                     where: { username }
                 });
                 if (!foundUser) {
-                    throw new CustomError('Incorrect username', `Could not find a user with ${username}. If you forgot your username, you can request it via email`, 400);
+                    throw new CustomError('Incorrect credentials', 'Username or password incorrect. You have a maximum of 5 login attempts. If you forgot your credentials, consider starting the recovery process', 400);
+
                 }
                 req.body.user = foundUser;
                 return true;
@@ -156,7 +157,7 @@ const login = {
                             }
                         }
                     });
-                    throw new CustomError('Incorrect password', `Your password is incorrect, please try again. You may only attempt to login ${5 - user.failedLoginAttempts}  times incorrectly, after that your account will be suspended`, 400);
+                    throw new CustomError('Incorrect credentials', 'Username or password incorrect. You have a maximum of 5 login attempts. If you forgot your credentials, consider starting the recovery process', 400);;
                 }
 
                 await prisma.user.update({
